@@ -1,7 +1,8 @@
-import { cn } from '@/lib/utils';
-import { PROTECTED_ROUTES } from '@/routes/routes';
 import { ShirtIcon } from 'lucide-react';
 import { Link } from 'react-router-dom';
+
+import { cn } from '@/lib/utils';
+import { PROTECTED_ROUTES } from '@/routes/routes';
 
 interface LogoProps {
   isCollapsed?: boolean;
