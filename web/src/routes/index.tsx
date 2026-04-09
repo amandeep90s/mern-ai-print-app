@@ -13,7 +13,7 @@ import RootLayout from './root-layout';
 import RouteGuard from './route-guard';
 import { protectedRoutesPaths, publicRoutesPaths } from './routes';
 
-export const Router = createBrowserRouter(
+export const router = createBrowserRouter(
   createRoutesFromElements(
     <Route element={<RootLayout />}>
       {/* Protected Routes */}

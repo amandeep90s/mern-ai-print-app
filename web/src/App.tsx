@@ -1,9 +1,7 @@
-import { Button } from './components/ui/button';
+import { RouterProvider } from 'react-router-dom';
+
+import { router } from '@/routes';
 
 export default function App() {
-  return (
-    <div className="container mx-auto py-6">
-      <Button variant={'secondary'}>Click Me</Button>
-    </div>
-  );
+  return <RouterProvider router={router} />;
 }
