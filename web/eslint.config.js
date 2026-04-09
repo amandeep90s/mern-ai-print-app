@@ -28,4 +28,11 @@ export default defineConfig([
       'simple-import-sort/exports': 'error',
     },
   },
+  // shadcn UI components intentionally export cva variants alongside components
+  {
+    files: ['src/components/ui/**/*.{ts,tsx}'],
+    rules: {
+      'react-refresh/only-export-components': 'off',
+    },
+  },
 ]);
