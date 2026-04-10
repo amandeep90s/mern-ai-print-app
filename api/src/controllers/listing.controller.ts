@@ -1,23 +1,74 @@
 import { Request, Response } from 'express';
+import { StatusCodes } from 'http-status-codes';
 
 import { asyncHandler } from '@/middlewares/asyncHandler.middleware';
+import {
+  createListingService,
+  generateArtworkService,
+  getListingBySlugService,
+  getMockupUrlService,
+  getUserListingsService,
+} from '@/services/listing.service';
+import {
+  createListingSchema,
+  generateArtworkSchema,
+  GetMockupUrlSchema,
+  slugSchema,
+} from '@/validators/listing.validator';
 
 export const createListingController = asyncHandler(
-  async (req: Request, res: Response) => {},
+  async (req: Request, res: Response) => {
+    const userId = req.user.id;
+    const body = createListingSchema.parse(req.body);
+    const data = await createListingService(userId, body);
+
+    return res.status(StatusCodes.CREATED).json({
+      message: 'Listing created successfully',
+      ...data,
+    });
+  },
 );
 
 export const getUserListingsController = asyncHandler(
-  async (req: Request, res: Response) => {},
+  async (req: Request, res: Response) => {
+    const userId = req.user.id;
+    const data = await getUserListingsService(userId);
+
+    return res.status(StatusCodes.OK).json({
+      message: 'Listings retrieved successfully',
+      ...data,
+    });
+  },
 );
 
 export const getListingBySlugController = asyncHandler(
-  async (req: Request, res: Response) => {},
+  async (req: Request, res: Response) => {
+    const { slug } = slugSchema.parse(req.params);
+    const data = await getListingBySlugService(slug);
+
+    return res.status(StatusCodes.OK).json({
+      message: 'Listing retrieved successfully',
+      ...data,
+    });
+  },
 );
 
 export const getMockupUrlController = asyncHandler(
-  async (req: Request, res: Response) => {},
+  async (req: Request, res: Response) => {
+    const { slug, colorName } = GetMockupUrlSchema.parse(req.params);
+    const url = await getMockupUrlService(slug, colorName);
+    res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+    return res.redirect(301, url);
+  },
 );
 
 export const generateArtworkController = asyncHandler(
-  async (req: Request, res: Response) => {},
+  async (req: Request, res: Response) => {
+    const { prompt } = generateArtworkSchema.parse(req.body);
+    const { artworkUrl } = await generateArtworkService(prompt);
+    return res.status(StatusCodes.OK).json({
+      message: 'Artwork generated successfully',
+      artworkUrl,
+    });
+  },
 );
