@@ -248,7 +248,7 @@ export const generateArtworkService = async (prompt: string) => {
     const uploadImg = await cloudinary.uploader.upload(
       `data:image/png;base64,${image.base64}`,
       {
-        folder: 'printify-ai/artworks',
+        folder: 'ai-print/artworks',
         resource_type: 'image',
       },
     );
@@ -272,7 +272,7 @@ export const generateArtworkService = async (prompt: string) => {
     const finalUpload = await cloudinary.uploader.upload(
       `data:image/png;base64,${bgBuffer.toString('base64')}`,
       {
-        folder: 'printify-ai/artworks',
+        folder: 'ai-print/artworks',
         resource_type: 'image',
       },
     );

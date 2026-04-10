@@ -2,7 +2,7 @@ import ProductColor from '@/models/product-color.model';
 import Product from '@/models/products.model';
 import { InternalServerException, NotFoundException } from '@/utils/app-error';
 
-export const getProductService = async () => {
+export const getProductsService = async () => {
   const products = await Product.find().lean();
 
   return {
