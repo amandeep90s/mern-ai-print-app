@@ -3,6 +3,7 @@ import { StatusCodes } from 'http-status-codes';
 import Stripe from 'stripe';
 
 import { Env } from '@/config/env.config';
+import logger from '@/config/logger.config';
 import stripeClient from '@/config/stripe.config';
 import Order, { OrderStatus } from '@/models/order.model';
 
@@ -35,7 +36,7 @@ export const stripeWebhookHandler = async (req: Request, res: Response) => {
         break;
       }
       default:
-        console.log(`Unhandled event type: ${event.type}`);
+        logger.warn(`Unhandled event type: ${event.type}`);
         break;
     }
     return res.status(StatusCodes.OK).json({ received: true });
@@ -49,7 +50,7 @@ export const stripeWebhookHandler = async (req: Request, res: Response) => {
 async function handleOrderCheckoutCompleted(session: Stripe.Checkout.Session) {
   const orderId = session.metadata?.orderId;
   if (!orderId) {
-    console.log('No OrderId in session metadata');
+    logger.warn('No OrderId in session metadata');
     return;
   }
 
@@ -58,9 +59,9 @@ async function handleOrderCheckoutCompleted(session: Stripe.Checkout.Session) {
       isPaid: true,
       status: OrderStatus.AWAITING_SHIPMENT,
     });
-    console.log(`Order marked as paid`);
-  } catch {
-    console.log('Error updating order');
+    logger.info(`Order ${orderId} marked as paid`);
+  } catch (error) {
+    logger.error(`Error updating order ${orderId}`, error);
     return;
   }
 }
@@ -68,7 +69,7 @@ async function handleOrderCheckoutCompleted(session: Stripe.Checkout.Session) {
 async function handleOrderCheckoutFailed(session: Stripe.Checkout.Session) {
   const orderId = session.metadata?.orderId;
   if (!orderId) {
-    console.log('No OrderId in session metadata');
+    logger.warn('No OrderId in session metadata');
     return;
   }
 
@@ -77,9 +78,9 @@ async function handleOrderCheckoutFailed(session: Stripe.Checkout.Session) {
       isPaid: false,
       status: OrderStatus.FAILED,
     });
-    console.log(`Order marked as failed`);
-  } catch {
-    console.log('Error updating order');
+    logger.info(`Order ${orderId} marked as failed`);
+  } catch (error) {
+    logger.error(`Error updating order ${orderId}`, error);
     return;
   }
 }

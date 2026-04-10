@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import { ZodError } from 'zod';
 
+import logger from '@/config/logger.config';
 import { AppError, ErrorCodes } from '@/utils/app-error';
 
 /**
@@ -36,7 +37,7 @@ export const errorHandler = (
   res: Response,
   _next: NextFunction,
 ) => {
-  console.log(`Error occured: ${req.path}`, error);
+  logger.error(`Error occurred on ${req.method} ${req.path}`, error);
 
   if (error instanceof SyntaxError) {
     return res.status(StatusCodes.BAD_REQUEST).json({
@@ -57,6 +58,5 @@ export const errorHandler = (
 
   return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
     message: 'Internal Server Error',
-    error: error?.message || 'Something went wrong',
   });
 };
