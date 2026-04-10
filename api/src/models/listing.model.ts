@@ -1,14 +1,14 @@
-import mongoose, { Document, Schema } from 'mongoose';
+import mongoose, { Document, Schema, Types } from 'mongoose';
 import slugify from 'slugify';
 
 export interface ListingDocument extends Document {
   userId: string;
-  templateId: Schema.Types.ObjectId;
+  templateId: Types.ObjectId;
   slug: string;
   title: string;
   description: string;
   sellingPrice: number;
-  colorIds: Schema.Types.ObjectId[];
+  colorIds: Types.ObjectId[];
   artworkUrl: string;
   artworkPlacement: {
     top: number;
@@ -28,13 +28,13 @@ const listingSchema = new Schema<ListingDocument>(
       required: true,
     },
     templateId: {
-      type: Schema.Types.ObjectId,
+      type: Types.ObjectId,
       ref: 'Product',
       required: true,
     },
     colorIds: [
       {
-        type: Schema.Types.ObjectId,
+        type: Types.ObjectId,
         ref: 'ProductColor',
       },
     ],

@@ -1,4 +1,4 @@
-import mongoose, { Document, Schema } from 'mongoose';
+import mongoose, { Document, Schema, Types } from 'mongoose';
 
 import { SIZE_OPTIONS } from './products.model';
 
@@ -11,9 +11,9 @@ export enum OrderStatus {
 }
 
 export interface OrderDocument extends Document {
-  listingId: Schema.Types.ObjectId;
-  colorId: Schema.Types.ObjectId;
-  size: typeof SIZE_OPTIONS;
+  listingId: Types.ObjectId;
+  colorId: Types.ObjectId;
+  size: (typeof SIZE_OPTIONS)[number];
   customerName: string;
   customerEmail: string;
   amount: number;
@@ -34,12 +34,12 @@ export interface OrderDocument extends Document {
 const orderSchema = new Schema<OrderDocument>(
   {
     listingId: {
-      type: Schema.Types.ObjectId,
+      type: Types.ObjectId,
       ref: 'Listing',
       required: true,
     },
     colorId: {
-      type: Schema.Types.ObjectId,
+      type: Types.ObjectId,
       ref: 'ProductColor',
       required: true,
     },
