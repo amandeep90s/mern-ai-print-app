@@ -20,11 +20,11 @@ export default function Logo({ isCollapsed = false, className }: LogoProps) {
     >
       <div
         className={cn(
-          'from-primary to-primary/80 text-primary-foreground flex size-8 items-center justify-center',
+          'from-primary to-primary/80 text-primary-foreground flex h-8 w-8 shrink-0 items-center justify-center',
           'rounded-xl bg-linear-to-tr shadow-sm transition-all duration-300 group-hover:scale-105 group-hover:shadow-md',
         )}
       >
-        <ShirtIcon className="size-4 shrink-0" />
+        <ShirtIcon className="h-4 w-4 shrink-0" />
       </div>
       <span
         className={cn(

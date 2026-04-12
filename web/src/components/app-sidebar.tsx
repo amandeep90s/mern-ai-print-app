@@ -1,6 +1,8 @@
 import { Home, Settings, TagIcon, Wallet } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 
+import { cn } from '@/lib/utils';
+
 import Logo from './logo';
 import {
   Sidebar,
@@ -43,14 +45,14 @@ export default function AppSidebar() {
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader>
-        <div className="px-1 pt-2">
+        <div className="pt-2">
           <Logo isCollapsed={state === 'collapsed'} />
         </div>
       </SidebarHeader>
 
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupContent className="list-none! px-1">
+          <SidebarGroupContent>
             {items.map(({ title, icon: Icon, url }) => (
               <SidebarMenuItem key={title}>
                 <SidebarMenuButton
@@ -59,9 +61,17 @@ export default function AppSidebar() {
                   isActive={url === location.pathname}
                   asChild
                 >
-                  <Link to={url}>
-                    <Icon className="size-6!" />
-                    <span>{title}</span>
+                  <Link
+                    to={url}
+                    className={cn(
+                      'flex',
+                      state === 'expanded'
+                        ? 'gap-2'
+                        : 'items-center justify-center',
+                    )}
+                  >
+                    <Icon className="size-6! stroke-1!" />
+                    {state === 'expanded' && <span>{title}</span>}
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>

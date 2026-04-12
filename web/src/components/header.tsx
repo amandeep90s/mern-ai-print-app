@@ -11,7 +11,7 @@ export default function Header() {
         </div>
 
         <UserButton
-          className="bg-sidebar"
+          className="bg-sidebar!"
           classNames={{
             trigger: {
               user: {
