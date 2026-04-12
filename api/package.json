@@ -10,7 +10,8 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "stripe:listen": "stripe listen --forward-to localhost:8000/api/webhook/stripe"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
