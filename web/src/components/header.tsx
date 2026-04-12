@@ -11,7 +11,7 @@ export default function Header() {
         </div>
 
         <UserButton
-          className="bg-sidebar!"
+          className="bg-background! cursor-pointer shadow-none!"
           classNames={{
             trigger: {
               user: {
@@ -21,6 +21,7 @@ export default function Header() {
               avatar: {
                 fallback: 'bg-black! text-white!',
               },
+              base: 'text-black',
             },
           }}
         />
