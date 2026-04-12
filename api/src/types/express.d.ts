@@ -1,6 +1,6 @@
-import { getAuth } from '@/lib/auth';
+import auth from '@/lib/auth';
 
-type Authsession = ReturnType<typeof getAuth>['$Infer']['Session'];
+type Authsession = ReturnType<typeof auth>['$Infer']['Session'];
 
 declare global {
   namespace Express {

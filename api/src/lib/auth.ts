@@ -7,7 +7,7 @@ import mongoose from 'mongoose';
 import { Env } from '@/config/env.config';
 import { compareValue, hashValue } from '@/utils/bcrypt';
 
-export const getAuth = () => {
+const auth = () => {
   if (!mongoose.connection.db) {
     throw new Error(
       'Database connection not established. Call connectDatabase() first.',
@@ -49,3 +49,5 @@ export const getAuth = () => {
     plugins: [openAPI(), jwt()],
   });
 };
+
+export default auth;
