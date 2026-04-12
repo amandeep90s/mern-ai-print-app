@@ -1,0 +1,27 @@
+POST http://localhost:8000/api/auth/sign-up/email
+Content-Type: application/json
+Origin: http://localhost:8000
+
+{
+  "name": "Amandeep Singh",
+  "email": "programmeramandeep@gmail.com",
+  "password": "Aman@1234",
+  "image": "",
+  "callbackURL": "",
+  "rememberMe": true
+}
+
+POST http://localhost:8000/api/auth/sign-in/email
+Content-Type: application/json
+
+{
+  "email": "kenddy@gmail.com",
+  "password": "123456",
+  "callbackURL": "",
+  "rememberMe": true
+}
+
+
+POST http://localhost:8000/api/auth/sign-out
+Content-Type: application/json
+Origin: http://localhost:8000

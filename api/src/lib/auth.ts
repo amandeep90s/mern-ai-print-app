@@ -7,14 +7,17 @@ import mongoose from 'mongoose';
 import { Env } from '@/config/env.config';
 import { compareValue, hashValue } from '@/utils/bcrypt';
 
-const auth = () => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let authInstance: any = null;
+
+export const initAuth = () => {
   if (!mongoose.connection.db) {
     throw new Error(
       'Database connection not established. Call connectDatabase() first.',
     );
   }
 
-  return betterAuth({
+  authInstance = betterAuth({
     baseURL: Env.BETTER_AUTH_URL,
     secret: Env.BETTER_AUTH_SECRET,
     trustedOrigins: [Env.FRONTEND_ORIGIN],
@@ -48,6 +51,13 @@ const auth = () => {
     },
     plugins: [openAPI(), jwt()],
   });
+
+  return authInstance;
 };
 
-export default auth;
+export const getAuth = (): ReturnType<typeof betterAuth> => {
+  if (!authInstance) {
+    throw new Error('Auth not initialized. Call initAuth() first.');
+  }
+  return authInstance!;
+};

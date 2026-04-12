@@ -1,7 +1,7 @@
 import { fromNodeHeaders } from 'better-auth/node';
 import { NextFunction, Request, Response } from 'express';
 
-import auth from '@/lib/auth';
+import { getAuth } from '@/lib/auth';
 import { UnauthorizedException } from '@/utils/app-error';
 
 /**
@@ -16,7 +16,7 @@ export const requireAuth = async (
   res: Response,
   next: NextFunction,
 ) => {
-  const authInstance = auth();
+  const authInstance = getAuth();
 
   const session = await authInstance.api.getSession({
     headers: fromNodeHeaders(req.headers),

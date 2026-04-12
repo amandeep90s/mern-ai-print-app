@@ -12,7 +12,7 @@ import path from 'path';
 import { connectDB } from '@/config/database.config';
 import { Env } from '@/config/env.config';
 import logger from '@/config/logger.config';
-import auth from '@/lib/auth';
+import { getAuth, initAuth } from '@/lib/auth';
 import { asyncHandler } from '@/middlewares/asyncHandler.middleware';
 import { errorHandler } from '@/middlewares/errorHandler.middleware';
 import morganMiddleware from '@/middlewares/morgan.middleware';
@@ -41,8 +41,7 @@ app.use(
 
 // Auth routes with stricter rate limit
 app.all('/api/auth/*splat', authLimiter, (req, res) => {
-  const authInstance = auth();
-  return toNodeHandler(authInstance)(req, res);
+  return toNodeHandler(getAuth())(req, res);
 });
 
 app.use('/api/webhook', webhookRoutes);
@@ -81,5 +80,6 @@ app.use(errorHandler);
 
 app.listen(Env.PORT, async () => {
   await connectDB();
+  initAuth();
   logger.info(`Server running on port ${Env.PORT} in ${Env.NODE_ENV} mode`);
 });
