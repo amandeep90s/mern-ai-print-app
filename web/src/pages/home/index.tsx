@@ -5,6 +5,7 @@ import bannerImage from '@/assets/banner.png';
 import { Card } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { getListingQueryFn, getProducts } from '@/lib/api';
+import { ENV } from '@/lib/env';
 import { PROTECTED_ROUTES } from '@/routes/routes';
 
 export default function HomePage() {
@@ -23,8 +24,8 @@ export default function HomePage() {
   const featuredProducts = productData?.products?.featured || [];
 
   return (
-    <div className="min-h-screen w-full">
-      <div className="mx-auto w-full max-w-6xl space-y-5 px-3 pb-10 xl:p-0">
+    <div className="min-h-screen w-full py-5">
+      <div className="container mx-auto w-full space-y-5 px-3 pb-10 xl:p-0">
         {/* Hero / Banner Section */}
         <section className="bg-muted mb-5 overflow-hidden">
           <div
@@ -77,6 +78,116 @@ export default function HomePage() {
                     </Link>
                   </Card>
                 ))}
+          </div>
+
+          {/* Small Card Grid */}
+          <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+            {isLoading
+              ? Array.from({ length: 4 }).map((_, index) => (
+                  <Skeleton
+                    key={index}
+                    className="aspect-square w-full rounded-xl"
+                  />
+                ))
+              : featuredProducts.map((product) => (
+                  <Card
+                    key={product._id}
+                    className="group cursor-pointer overflow-hidden rounded-lg border-none! p-0 shadow-sm"
+                  >
+                    <Link
+                      to={PROTECTED_ROUTES.DESIGN.replace(
+                        ':product_id',
+                        product._id,
+                      )}
+                    >
+                      <div className="bg-muted aspect-square overflow-hidden">
+                        <img
+                          src={product.displayUrl}
+                          alt={product.name}
+                          className="h-full w-full object-cover object-top group-hover:opacity-90"
+                        />
+                      </div>
+                      <div className="px-4 py-2">
+                        <h3 className="truncate text-base font-medium">
+                          {product.name}
+                        </h3>
+                        <p className="text-muted-foreground mb-1 text-sm">
+                          {product.body}
+                        </p>
+                      </div>
+                    </Link>
+                  </Card>
+                ))}
+          </div>
+        </section>
+
+        <section>
+          <div className="mb-6 flex items-center justify-between">
+            <div>
+              <h2 className="text-2xl font-bold">My Listings</h2>
+              <p className="text-muted-foreground text-sm">
+                Manage your active listings and track their performance.
+              </p>
+            </div>
+            <Link
+              to={PROTECTED_ROUTES.LISTINGS}
+              className="text-sm font-medium underline"
+            >
+              View all
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+            {isListingLoading ? (
+              Array.from({ length: 4 }).map((_, index) => (
+                <Skeleton
+                  key={index}
+                  className="aspect-square w-full rounded-xl"
+                />
+              ))
+            ) : listings?.length === 0 ? (
+              <p>No listings found</p>
+            ) : (
+              listings.slice(0, 8).map((listing) => (
+                <Card
+                  key={listing._id}
+                  className="group cursor-pointer overflow-hidden rounded-lg border-none! p-0 shadow-sm"
+                >
+                  <a href={`/listing/${listing.slug}`} target="_blank">
+                    <div className="bg-muted aspect-square overflow-hidden">
+                      <img
+                        src={`${ENV.BASE_API_URL}/api/listing/mockup/${listing.slug}/${listing.colorIds[0]?.name.toLowerCase().replace(/\s+/g, '-')}.jpg`}
+                        alt={listing.title}
+                        className="h-full w-full object-contain group-hover:opacity-90"
+                        fetchPriority="high"
+                        decoding="async"
+                        loading="lazy"
+                        onError={(e) => {
+                          e.currentTarget.src = listing.artworkUrl;
+                        }}
+                      />
+                    </div>
+                    <div className="space-y-1 px-3 py-3">
+                      <h3 className="truncate text-sm font-medium">
+                        {listing.title}
+                      </h3>
+                      <p className="text-muted-foreground text-sm font-light">
+                        Sale price ${listing.sellingPrice}
+                      </p>
+                      <div className="flex gap-1">
+                        {listing.colorIds?.map((color) => (
+                          <div
+                            key={color._id}
+                            className="size-4 rounded-full border"
+                            style={{ backgroundColor: color.color }}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  </a>
+                </Card>
+              ))
+            )}
           </div>
         </section>
       </div>

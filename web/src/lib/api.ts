@@ -4,6 +4,7 @@ import { ENV } from '@/lib/env';
 import type {
   CreateListingType,
   GetListingBySlugResponse,
+  GetUserListingsResponse,
 } from '@/types/listing';
 import type { CreateOrderType, GetUserOrdersResponse } from '@/types/order';
 import type {
@@ -30,8 +31,8 @@ export const getProducts = async (): Promise<GetAllProductsResponse> => {
   return response.data;
 };
 
-export const getListingQueryFn = async () => {
-  const response = await API.get('/listing/all');
+export const getListingQueryFn = async (): Promise<GetUserListingsResponse> => {
+  const response = await API.get<GetUserListingsResponse>('/listing/all');
 
   return response.data;
 };

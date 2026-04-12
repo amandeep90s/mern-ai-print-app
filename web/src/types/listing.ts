@@ -29,9 +29,22 @@ export type ListingSingleType = {
   sizes: string[];
   templateName: string;
   templateBody: string;
+  artworkUrl: string;
+  artworkPlacement: {
+    top: number;
+    left: number;
+    width: number;
+    height: number;
+    refDisplayWidth: number;
+  };
   colorIds: ColorIdsType[];
   createdAt: string;
   updatedAt: string;
+};
+
+export type GetUserListingsResponse = {
+  message: string;
+  listings: ListingSingleType[];
 };
 
 export type GetListingBySlugResponse = {
