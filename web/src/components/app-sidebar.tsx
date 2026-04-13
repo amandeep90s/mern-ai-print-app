@@ -52,12 +52,15 @@ export default function AppSidebar() {
 
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupContent>
+          <SidebarGroupContent className="space-y-1">
             {items.map(({ title, icon: Icon, url }) => (
               <SidebarMenuItem key={title}>
                 <SidebarMenuButton
                   size="lg"
-                  className="hover:bg-primary text-base hover:text-white"
+                  className={cn(
+                    'hover:bg-secondary text-base',
+                    url === location.pathname && 'bg-primary! text-white!',
+                  )}
                   isActive={url === location.pathname}
                   asChild
                 >
