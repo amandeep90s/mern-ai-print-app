@@ -13,7 +13,7 @@ export default function AppLayout() {
       <main className="mx-auto flex h-full min-h-screen w-full flex-col">
         <Header />
 
-        <div className="mt-2 flex-1">
+        <div className="mt-5 flex-1">
           <Outlet />
         </div>
 

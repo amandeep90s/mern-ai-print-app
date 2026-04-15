@@ -25,7 +25,7 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen w-full py-5">
-      <div className="container mx-auto w-full space-y-5 px-3 pb-10 xl:p-0">
+      <div className="w-full space-y-6 px-6 pb-10">
         {/* Hero / Banner Section */}
         <section className="bg-muted mb-5 overflow-hidden">
           <div
