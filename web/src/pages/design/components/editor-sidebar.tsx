@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
-import type { IText } from 'fabric';
+import { FabricImage, IText } from 'fabric';
 import {
   BoldIcon,
   Check,
@@ -10,8 +10,9 @@ import {
   Type,
   UnderlineIcon,
 } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 
 import art1 from '@/assets/artworks/art-1.png';
 import art2 from '@/assets/artworks/art-2.png';
@@ -42,6 +43,7 @@ import type { ListingDataKey } from '@/context/canvas-context';
 import { useCanvas } from '@/hooks/use-canvas';
 import { createListingMutationFn, generateArtworkMutationFn } from '@/lib/api';
 import { cn } from '@/lib/utils';
+import { PROTECTED_ROUTES } from '@/routes/routes';
 import type { CreateListingType } from '@/types/listing';
 import type { ProductColorType } from '@/types/product';
 
@@ -99,16 +101,68 @@ export default function EditorSidebar({
       },
     });
 
-  const addImageToCanvaas = () => {
-    //
+  useEffect(() => {
+    if (!canvasEditor) return;
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const onSelect = (e: any) => {
+      const obj = e.selected?.[0];
+      setActiveTextObj(obj);
+
+      if (obj?.type === 'i-text') {
+        setTextProps({
+          fill: obj.fill as string,
+          fontFamily: obj.fontFamily,
+          fontWeight: obj.fontWeight as string,
+          fontStyle: obj.fontStyle as string,
+          underline: obj.underline as boolean,
+        });
+      } else {
+        setActiveTextObj(null);
+      }
+    };
+
+    const onClear = () => setActiveTextObj(null);
+    canvasEditor.on('selection:created', onSelect);
+    canvasEditor.on('selection:updated', onSelect);
+    canvasEditor.on('selection:cleared', onClear);
+
+    return () => {
+      canvasEditor.off('selection:created', onSelect);
+      canvasEditor.off('selection:updated', onSelect);
+      canvasEditor.off('selection:cleared', onClear);
+    };
+  }, [canvasEditor]);
+
+  const addImageToCanvas = async (url: string) => {
+    if (!canvasEditor) return;
+
+    const img = await FabricImage.fromURL(url, { crossOrigin: 'anonymous' });
+    img.scaleToWidth(canvasEditor.getWidth() * 0.75);
+    canvasEditor.add(img);
+    canvasEditor.centerObject(img);
   };
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    //
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files?.[0]) return;
+
+    const url = URL.createObjectURL(e.target.files[0]);
+    await addImageToCanvas(url);
+    e.target.value = '';
   };
 
   const addText = () => {
-    //
+    if (!canvasEditor) return;
+    const text = new IText('TEXT', {
+      left: 120,
+      top: 100,
+      fontSize: 40,
+      fontFamily: 'Helvetica',
+      fontWeight: 'normal',
+      fill: '#000000',
+    });
+    canvasEditor.add(text);
+    canvasEditor.setActiveObject(text);
   };
 
   const updateText = (args: Partial<typeof textProps>) => {
@@ -122,19 +176,64 @@ export default function EditorSidebar({
   };
 
   const handleColorChange = (color: ProductColorType) => {
-    //
+    const coloredList = listingData.selectedColors || [];
+    const isSelected = coloredList.some((c) => c._id === color._id);
+    let newColors;
+    if (isSelected) {
+      newColors = coloredList.filter((c) => c._id !== color._id);
+    } else {
+      if (coloredList.length >= 4) return; // End interaction if limit reached
+      newColors = [...coloredList, color];
+    }
+    updatedListingState('selectedColors', newColors);
   };
 
   const isFormValid = () => {
-    return true;
+    return (
+      listingData.title.trim() !== '' &&
+      listingData.description.trim() !== '' &&
+      listingData.sellingPrice >= (basePrice || 0) &&
+      listingData.selectedColors.length > 0 &&
+      canvasEditor !== null
+    );
   };
 
   const handleSubmit = () => {
-    //
+    if (!isFormValid()) {
+      toast.error('Please fill all fields');
+      return;
+    }
+    const payload = {
+      templateId: templateId,
+      title: listingData.title,
+      description: listingData.description,
+      sellingPrice: parseFloat(Number(listingData.sellingPrice).toFixed(2)),
+      colorIds: listingData.selectedColors.map((color) => color._id),
+      artworkUrl: listingData.artworkUrl,
+      artworkPlacement: listingData.artworkPlacement,
+    };
+    createListing(payload, {
+      onSuccess: () => {
+        toast.success('Listing created successfully');
+        navigate(PROTECTED_ROUTES.LISTINGS);
+      },
+      onError: () => {
+        toast.error('Failed to submit listing');
+      },
+    });
   };
 
-  const handleAIArtwork = () => {
-    //
+  const handleAIArtwork = async () => {
+    if (isGeneratingArtwork) return;
+    generateArtwork(userPrompt, {
+      onSuccess: async (data) => {
+        await addImageToCanvas(data.artworkUrl);
+        setOpenPopover(false);
+      },
+      onError: () => {
+        toast.error('Failed to generate artwork');
+      },
+    });
   };
 
   return (
