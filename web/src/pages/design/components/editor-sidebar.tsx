@@ -114,8 +114,8 @@ export default function EditorSidebar({
           fill: obj.fill as string,
           fontFamily: obj.fontFamily,
           fontWeight: obj.fontWeight as string,
-          fontStyle: obj.fontStyle as string,
-          underline: obj.underline as boolean,
+          underline: obj.underline ?? false,
+          fontStyle: obj.fontStyle,
         });
       } else {
         setActiveTextObj(null);
@@ -166,7 +166,8 @@ export default function EditorSidebar({
   };
 
   const updateText = (args: Partial<typeof textProps>) => {
-    activeTextObj?.set(args as unknown);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    activeTextObj?.set(args as any);
     canvasEditor?.requestRenderAll();
     setTextProps((prev) => ({ ...prev, ...args }));
   };
@@ -186,6 +187,11 @@ export default function EditorSidebar({
       newColors = [...coloredList, color];
     }
     updatedListingState('selectedColors', newColors);
+  };
+
+  const handlePresetArtwork = async (art: string) => {
+    await addImageToCanvas(art);
+    setOpenPopover(false);
   };
 
   const isFormValid = () => {
@@ -303,7 +309,7 @@ export default function EditorSidebar({
                         <>
                           <Spinner />
                           <span className="leading-tight">
-                            Generating...(~30s)
+                            Generating... (~30s)
                           </span>
                         </>
                       ) : (
@@ -325,6 +331,7 @@ export default function EditorSidebar({
                         <button
                           key={index}
                           className="border-border hover:border-primary hover:ring-primary/20 overflow-hidden rounded-md border bg-white p-1 shadow-sm hover:ring-2"
+                          onClick={() => handlePresetArtwork(artwork)}
                         >
                           <img
                             src={artwork}
@@ -415,11 +422,10 @@ export default function EditorSidebar({
           </div>
 
           <div className="flex flex-wrap gap-2">
-            {colors.map((item) => {
+            {colors?.map((item) => {
               const isSelected = (listingData.selectedColors || []).some(
                 (c) => c._id === item._id,
               );
-
               const isWhite = item.color.trim() === 'rgb(255, 255, 255)';
 
               return (
