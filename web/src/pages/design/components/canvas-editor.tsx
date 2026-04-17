@@ -55,6 +55,10 @@ export default function CanvasEditor({
   );
 
   useEffect(() => {
+    setIsMaskLoaded(false);
+  }, [template.baseUrl]);
+
+  useEffect(() => {
     if (!canvasRef.current || !template) return;
     let canvas: Canvas;
 

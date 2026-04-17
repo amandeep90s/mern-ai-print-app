@@ -1,3 +1,4 @@
+import { gateway } from '@ai-sdk/gateway';
 import { generateImage, generateText } from 'ai';
 
 import cloudinary from '@/config/cloudinary.config';
@@ -231,13 +232,13 @@ export const getMockupUrlService = async (slug: string, colorName: string) => {
 export const generateArtworkService = async (prompt: string) => {
   try {
     const { text } = await generateText({
-      model: 'anthropic/claude-opus-4.5',
+      model: gateway('anthropic/claude-opus-4.5'),
       system: SYSTEM_PROMPT,
       prompt: prompt,
     });
 
     const result = await generateImage({
-      model: 'recraft/recraft-v4',
+      model: gateway.image('recraft/recraft-v4'),
       prompt: text.trim(),
       size: '1024x1024',
     });

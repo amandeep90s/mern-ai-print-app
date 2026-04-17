@@ -11,7 +11,9 @@
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "stripe:listen": "stripe listen --forward-to localhost:8000/api/webhook/stripe"
+    "stripe:listen": "stripe listen --forward-to localhost:8000/api/webhook/stripe",
+    "seed:products": "bun run src/scripts/seed-products.ts",
+    "seed:colors": "bun run src/scripts/seed-template-colors.ts"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
