@@ -1,8 +1,25 @@
 import 'dotenv/config';
 
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+import cloudinary from '@/config/cloudinary.config';
 import { connectDB } from '@/config/database.config';
 import ProductColor from '@/models/product-color.model';
 import Product, { ProductType } from '@/models/products.model';
+
+const ASSETS_DIR = path.resolve(
+  path.dirname(fileURLToPath(import.meta.url)),
+  '../assets',
+);
+
+const uploadMockup = async (localFile: string): Promise<string> => {
+  const result = await cloudinary.uploader.upload(localFile, {
+    folder: 'ai-print/mockups',
+    resource_type: 'image',
+  });
+  return result.secure_url;
+};
 
 const seedColors = async () => {
   try {
@@ -25,42 +42,54 @@ const seedColors = async () => {
     const TSHIRT_TEMPLATE_ID = tshirtTemplate._id;
     const HOODIE_TEMPLATE_ID = hoodieTemplate._id;
 
-    const colors = [
+    console.log('Uploading mockup images to Cloudinary...');
+
+    const colorDefs = [
       // T-Shirt Colors
       {
         templateId: TSHIRT_TEMPLATE_ID,
         name: 'White',
         color: 'rgb(255, 255, 255)',
-        mockupUrl:
-          'https://res.cloudinary.com/dp9vvlndo/image/upload/v1773687938/tshirt-white-mockup_zw59ck.png',
+        localFile: path.join(
+          ASSETS_DIR,
+          'tshirt-mockup/tshirt-white-mockup.png',
+        ),
       },
       {
         templateId: TSHIRT_TEMPLATE_ID,
         name: 'Very Dark Gray',
         color: 'rgb(26, 26, 26)',
-        mockupUrl:
-          'https://res.cloudinary.com/dp9vvlndo/image/upload/v1773687937/tshirt-dark-grey-mockup_bdbvfa.png',
+        localFile: path.join(
+          ASSETS_DIR,
+          'tshirt-mockup/tshirt-dark-grey-mockup.png',
+        ),
       },
       {
         templateId: TSHIRT_TEMPLATE_ID,
         name: 'Medium Blue',
         color: 'rgb(58, 75, 152)',
-        mockupUrl:
-          'https://res.cloudinary.com/dp9vvlndo/image/upload/v1773687938/tshirt-medium-blue-mokup_ou9kry.png',
+        localFile: path.join(
+          ASSETS_DIR,
+          'tshirt-mockup/tshirt-medium-blue-mokup.png',
+        ),
       },
       {
         templateId: TSHIRT_TEMPLATE_ID,
         name: 'Light Pink',
         color: 'rgb(244, 144, 182)',
-        mockupUrl:
-          'https://res.cloudinary.com/dp9vvlndo/image/upload/v1773687938/tshirt-pink-mockup_buazv1.png',
+        localFile: path.join(
+          ASSETS_DIR,
+          'tshirt-mockup/tshirt-pink-mockup.png',
+        ),
       },
       {
         templateId: TSHIRT_TEMPLATE_ID,
         name: 'Dark Green',
         color: 'rgb(19, 69, 34)',
-        mockupUrl:
-          'https://res.cloudinary.com/dp9vvlndo/image/upload/v1773687936/tshirt-dark-green-mockup_m8afg9.png',
+        localFile: path.join(
+          ASSETS_DIR,
+          'tshirt-mockup/tshirt-dark-green-mockup.png',
+        ),
       },
 
       // Hoodie Colors
@@ -68,38 +97,53 @@ const seedColors = async () => {
         templateId: HOODIE_TEMPLATE_ID,
         name: 'White',
         color: 'rgb(255, 255, 255)',
-        mockupUrl:
-          'https://res.cloudinary.com/dp9vvlndo/image/upload/v1773687872/hoodie-white-mockup_eya9nz.png',
+        localFile: path.join(
+          ASSETS_DIR,
+          'hoodie-mockup/hoodie-white-mockup.png',
+        ),
       },
       {
         templateId: HOODIE_TEMPLATE_ID,
         name: 'Very Dark Gray',
         color: 'rgb(15, 15, 15)',
-        mockupUrl:
-          'https://res.cloudinary.com/dp9vvlndo/image/upload/v1773687871/hoodie-dark-grey-mockup_qoxxfp.png',
+        localFile: path.join(
+          ASSETS_DIR,
+          'hoodie-mockup/hoodie-dark-grey-mockup.png',
+        ),
       },
       {
         templateId: HOODIE_TEMPLATE_ID,
         name: 'Medium Blue',
         color: 'rgb(0, 53, 148)',
-        mockupUrl:
-          'https://res.cloudinary.com/dp9vvlndo/image/upload/v1773687875/hoodie-medium-blue-mockup_tckmsu.png',
+        localFile: path.join(
+          ASSETS_DIR,
+          'hoodie-mockup/hoodie-medium-blue-mockup.png',
+        ),
       },
       {
         templateId: HOODIE_TEMPLATE_ID,
         name: 'Red',
         color: 'rgb(186, 12, 47)',
-        mockupUrl:
-          'https://res.cloudinary.com/dp9vvlndo/image/upload/v1773687873/hoodie-red-mockup_xyzke2.png',
+        localFile: path.join(ASSETS_DIR, 'hoodie-mockup/hoodie-red-mockup.png'),
       },
       {
         templateId: HOODIE_TEMPLATE_ID,
         name: 'Dark Purple',
         color: 'rgb(71, 10, 104)',
-        mockupUrl:
-          'https://res.cloudinary.com/dp9vvlndo/image/upload/v1773687872/hoodie-dark-purple-mockup_uiefd0.png',
+        localFile: path.join(
+          ASSETS_DIR,
+          'hoodie-mockup/hoodie-dark-purple-mockup.png',
+        ),
       },
     ];
+
+    const colors = await Promise.all(
+      colorDefs.map(async ({ localFile, ...rest }) => {
+        const mockupUrl = await uploadMockup(localFile);
+        console.log(`  Uploaded: ${path.basename(localFile)} -> ${mockupUrl}`);
+        return { ...rest, mockupUrl };
+      }),
+    );
 
     await ProductColor.deleteMany({});
     const created = await ProductColor.insertMany(colors);

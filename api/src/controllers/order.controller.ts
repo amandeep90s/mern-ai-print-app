@@ -4,7 +4,7 @@ import { StatusCodes } from 'http-status-codes';
 import { asyncHandler } from '@/middlewares/asyncHandler.middleware';
 import {
   createOrderService,
-  getUserOrdersSrevice,
+  getUserOrdersService,
 } from '@/services/order.service';
 import { createOrderSchema } from '@/validators/order.validator';
 
@@ -24,7 +24,7 @@ export const getUserOrdersController = asyncHandler(
   async (req: Request, res: Response) => {
     const userId = req.user.id;
 
-    const orders = await getUserOrdersSrevice(userId);
+    const orders = await getUserOrdersService(userId);
 
     return res
       .status(StatusCodes.OK)

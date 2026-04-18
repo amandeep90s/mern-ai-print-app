@@ -86,7 +86,7 @@ export const createOrderService = async (data: CreateOrderType) => {
  * The orders are populated with the listing's title, slug, artwork URL, and the color's name and color code.
  * The results are sorted by creation date in descending order.
  */
-export const getUserOrdersSrevice = async (userId: string) => {
+export const getUserOrdersService = async (userId: string) => {
   const listings = await Listing.find({ userId }).select('_id');
   const listingIds = listings.map((listing) => listing._id);
 

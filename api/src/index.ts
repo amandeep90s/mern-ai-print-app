@@ -23,7 +23,11 @@ import webhookRoutes from '@/routes/webhook.route';
 const app = express();
 
 // Security headers
-app.use(helmet());
+app.use(
+  helmet({
+    crossOriginResourcePolicy: { policy: 'cross-origin' },
+  }),
+);
 
 // HTTP parameter pollution protection
 app.use(hpp());

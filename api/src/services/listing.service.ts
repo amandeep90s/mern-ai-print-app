@@ -7,6 +7,7 @@ import Listing from '@/models/listing.model';
 import type { ProductColorDocument } from '@/models/product-color.model';
 import Product, { ProductDocument } from '@/models/products.model';
 import {
+  AppError,
   BadRequestException,
   InternalServerException,
   NotFoundException,
@@ -15,6 +16,24 @@ import { SYSTEM_PROMPT } from '@/utils/prompt';
 import { CreateListingType } from '@/validators/listing.validator';
 
 const toSlug = (str: string) => str.toLowerCase().replace(/\s+/g, '-');
+
+/**
+ * Extract the Cloudinary public ID from a full URL.
+ * Returns the public ID with `/` folder separators (for use as base image).
+ */
+const getPublicId = (url: string) => {
+  const parts = url.split('/upload/');
+  if (!parts[1])
+    throw new InternalServerException('Invalid Cloudinary URL format');
+  return parts[1]
+    .replace(/^v\d+\//, '') // remove version prefix e.g. v1773951553/
+    .replace(/\.[^.]+$/, ''); // remove extension
+};
+
+/**
+ * Convert a public ID to Cloudinary overlay format (colons instead of slashes).
+ */
+const toOverlayId = (publicId: string) => publicId.replace(/\//g, ':');
 
 /**
  * Create a new listing
@@ -72,7 +91,8 @@ export const createListingService = async (
     });
 
     return { listing };
-  } catch {
+  } catch (error) {
+    if (error instanceof AppError) throw error;
     throw new InternalServerException('Failed to create listing');
   }
 };
@@ -94,7 +114,8 @@ export const getUserListingsService = async (userId: string) => {
       .lean();
 
     return { listings };
-  } catch {
+  } catch (error) {
+    if (error instanceof AppError) throw error;
     throw new InternalServerException('Failed to get user listings');
   }
 };
@@ -142,7 +163,8 @@ export const getListingBySlugService = async (slug: string) => {
         colorIds: colors,
       },
     };
-  } catch {
+  } catch (error) {
+    if (error instanceof AppError) throw error;
     throw new InternalServerException('Failed to get listing by slug');
   }
 };
@@ -180,18 +202,8 @@ export const getMockupUrlService = async (slug: string, colorName: string) => {
   }
 
   const printableArea = template.printableArea;
-  const getPublicId = (url: string) => {
-    const parts = url.split('/upload/');
-    if (!parts[1]) {
-      throw new InternalServerException('Invalid URL format');
-    }
-    return parts[1]
-      .replace(/^v\d+\//, '') // remove version prefix e.g. v1773951553/
-      .replace(/\.[^.]+$/, '') // remove extension
-      .replace(/\//g, ':'); // slashes → colons
-  };
 
-  const artworkPublicId = getPublicId(listing.artworkUrl);
+  const artworkPublicId = toOverlayId(getPublicId(listing.artworkUrl));
   const mockupPublicId = getPublicId(color.mockupUrl);
 
   const { refDisplayWidth } = listing.artworkPlacement;
@@ -279,7 +291,8 @@ export const generateArtworkService = async (prompt: string) => {
     );
 
     return { artworkUrl: finalUpload.secure_url };
-  } catch {
+  } catch (error) {
+    if (error instanceof AppError) throw error;
     throw new InternalServerException('Failed to generate artwork');
   }
 };

@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { Ruler, ShieldCheck } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
 import Logo from '@/components/logo';
@@ -30,9 +30,12 @@ export default function SingleListingPage() {
   });
 
   const listing = data?.listing as ListingSingleType;
-  const [selectedColor, setSelectedColor] = useState<ColorIdsType | null>(
-    listing?.colorIds?.[0] ?? null,
-  );
+  const [selectedColor, setSelectedColor] = useState<ColorIdsType | null>(null);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (listing?.colorIds?.length) setSelectedColor(listing.colorIds[0]);
+  }, [listing]);
 
   if (isLoading) {
     return (
@@ -79,6 +82,9 @@ export default function SingleListingPage() {
                   fetchPriority="high"
                   decoding="async"
                   className="h-full w-full object-contain"
+                  onError={(e) => {
+                    e.currentTarget.src = listing.artworkUrl;
+                  }}
                 />
               )}
             </div>
@@ -102,6 +108,9 @@ export default function SingleListingPage() {
                     fetchPriority="high"
                     decoding="async"
                     alt={color.name}
+                    onError={(e) => {
+                      e.currentTarget.src = listing.artworkUrl;
+                    }}
                   />
                 </button>
               ))}

@@ -10,6 +10,7 @@ export type CreateListingType = {
     left: number;
     width: number;
     height: number;
+    refDisplayWidth: number;
   };
 };
 
